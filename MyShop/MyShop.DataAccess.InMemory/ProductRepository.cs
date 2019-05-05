@@ -37,7 +37,12 @@ namespace MyShop.DataAccess.InMemory
 
             if(productToUpdate != null)
             {
-                productToUpdate = product;
+                productToUpdate.Category = product.Category;                
+                productToUpdate.Description = product.Description;                
+                productToUpdate.Image = product.Image;                
+                productToUpdate.Name = product.Name;                
+                productToUpdate.Price = product.Price;   
+                
             }
             else
             {
