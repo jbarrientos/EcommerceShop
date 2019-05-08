@@ -4,6 +4,7 @@ using MyShop.Core.ViewModels;
 using MyShop.DataAccess.InMemory;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -45,6 +46,12 @@ namespace MyShop.WebUI.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (Request != null)
+                {
+                    HttpPostedFileBase fileToUpload = Request.Files["file"];
+                    model.Product.Image = model.Product.Id + Path.GetExtension(fileToUpload.FileName);
+                    fileToUpload.SaveAs(Server.MapPath("//Content//ProductImages//") + model.Product.Image);
+                }
                 context.Insert(model.Product);
                 context.Commit();
 
@@ -52,6 +59,7 @@ namespace MyShop.WebUI.Controllers
             }
             else
             {
+                
                 model.ProductCategories = productCategories.Collection().ToList();
                 return View(model);
             }
@@ -81,6 +89,14 @@ namespace MyShop.WebUI.Controllers
         {
             if (!ModelState.IsValid)
                 return HttpNotFound();
+
+            if (Request != null)
+            {
+                HttpPostedFileBase fileToUpload = Request.Files["file"];
+                model.Product.Image = model.Product.Id + Path.GetExtension(fileToUpload.FileName);
+                fileToUpload.SaveAs(Server.MapPath("//Content//ProductImages//") + model.Product.Image);
+            }
+            
             
             context.Update(model.Product);
             context.Commit();

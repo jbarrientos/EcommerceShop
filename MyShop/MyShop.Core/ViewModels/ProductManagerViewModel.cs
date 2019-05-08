@@ -13,5 +13,7 @@ namespace MyShop.Core.ViewModels
 
         public IEnumerable<ProductCategory> ProductCategories { get; set; }
 
+        
+
     }
 }
