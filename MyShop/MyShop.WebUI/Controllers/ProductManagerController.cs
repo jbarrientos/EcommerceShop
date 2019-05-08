@@ -1,4 +1,5 @@
 ﻿using MyShop.Core.Models;
+using MyShop.Core.ViewModels;
 using MyShop.DataAccess.InMemory;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,12 @@ namespace MyShop.WebUI.Controllers
     public class ProductManagerController : Controller
     {
         ProductRepository context;
+        ProductCategoryRepository productCategories;
 
         public ProductManagerController()
         {
             context = new ProductRepository();
+            productCategories = new ProductCategoryRepository();
         }
         // GET: ProductManager
         public ActionResult Index()
@@ -26,23 +29,33 @@ namespace MyShop.WebUI.Controllers
 
         public ActionResult Create()
         {
-            Product product = new Product();
+            ProductManagerViewModel vm = new ProductManagerViewModel
+            {
+                ProductCategories = productCategories.Collection().ToList(), 
+                Product = new Product()
+            };
 
-            return View(product);
+            
+            return View(vm);
         }
 
         [HttpPost]
-        public ActionResult Create(Product product)
+        public ActionResult Create(ProductManagerViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return View(product);
+                context.Insert(model.Product);
+                context.Commit();
+
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                model.ProductCategories = productCategories.Collection().ToList();
+                return View(model);
             }
 
-            context.Insert(product);
-            context.Commit();
-
-            return RedirectToAction("Index");
+            
 
         }
 
@@ -50,19 +63,25 @@ namespace MyShop.WebUI.Controllers
         {
             Product product = context.Find(Id);
 
+            ProductManagerViewModel vm = new ProductManagerViewModel
+            {
+                Product = product,
+                ProductCategories = productCategories.Collection().ToList()
+            };
+
             if (product == null)
                 return HttpNotFound();
 
-            return View(product);
+            return View(vm);
         }
 
         [HttpPost]
-        public ActionResult Edit(Product product)
+        public ActionResult Edit(ProductManagerViewModel model)
         {
             if (!ModelState.IsValid)
                 return HttpNotFound();
             
-            context.Update(product);
+            context.Update(model.Product);
             context.Commit();
 
             return RedirectToAction("Index");
